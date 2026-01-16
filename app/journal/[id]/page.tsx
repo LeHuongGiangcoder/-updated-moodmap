@@ -301,115 +301,105 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
           </button>
 
           {showTimeline && (
-            <div className="p-6 h-full flex flex-col">
-              <div className="flex justify-between items-center mb-8 mt-2">
-                <h3 className="font-bold text-lg">Itinerary</h3>
-                <button><MoreVertical className="w-4 h-4 text-gray-400" /></button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto space-y-8 relative">
-                {/* Timeline Line */}
-                <div className="absolute left-[7px] top-2 bottom-0 w-[2px] bg-zinc-800"></div>
-
-                {/* Timeline Items */}
-                {trip.entries && trip.entries.length > 0 ? (
-                  trip.entries.map((entry, index) => {
-                    const isCurrent = index === currentEntryIndex;
-                    return (
-                      <div 
-                        key={index} 
-                        className={`relative pl-8 cursor-pointer transition-opacity ${isCurrent ? 'opacity-100' : 'opacity-60 hover:opacity-80'}`}
-                        onClick={() => setCurrentEntryIndex(index)}
-                      >
-                        <div className={`absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 ${isCurrent ? 'bg-[var(--primary-green)] border-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]' : 'bg-[#0b1016] border-zinc-600'}`}></div>
-                        
-                        <div className="text-xs text-gray-400 mb-1">
-                          {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </div>
-                        <div className="font-bold text-sm mb-1">{entry.city}</div>
-                        {isCurrent && (
-                          <div className="text-xs text-gray-500 leading-relaxed mt-1 p-3 bg-zinc-800/50 rounded border border-zinc-700/50 line-clamp-3">
-                            {entry.content}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="pl-8 text-gray-500 text-sm">No stops added yet.</div>
-                )}
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-zinc-800">
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="btn-tertiary w-full text-sm py-2 flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add New City
+            <div className="h-full overflow-y-auto p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold font-['Geomanist']">Itinerary</h2>
+                <button className="p-1 hover:bg-zinc-800 rounded transition-colors">
+                  <MoreVertical className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
+
+              <div className="space-y-6 relative before:absolute before:left-[7px] before:top-2 before:bottom-0 before:w-0.5 before:bg-zinc-800">
+                {trip.entries?.map((entry, index) => (
+                  <div key={entry.id} className="relative pl-6">
+                    <button 
+                      onClick={() => setCurrentEntryIndex(index)}
+                      className={`absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 transition-colors z-10 ${
+                        index === currentEntryIndex 
+                          ? 'bg-[var(--primary-green)] border-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]' 
+                          : 'bg-[#0b1016] border-zinc-600 hover:border-[var(--primary-green)]'
+                      }`}
+                    ></button>
+                    
+                    <div className={`group cursor-pointer transition-all ${index === currentEntryIndex ? 'opacity-100' : 'opacity-60 hover:opacity-80'}`}
+                         onClick={() => setCurrentEntryIndex(index)}>
+                      <p className="text-xs text-gray-400 mb-1">{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                      <h3 className="font-bold mb-2">{entry.city}</h3>
+                      <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2">
+                        {entry.content}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="w-full mt-8 py-3 rounded-full border border-zinc-700 hover:border-[var(--primary-green)] hover:text-[var(--primary-green)] transition-all flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add New City
+              </button>
             </div>
           )}
         </div>
-
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-[#0b1016] border border-zinc-800 rounded-xl w-full max-w-lg p-6 relative">
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white"
-              >
-                <PanelRightClose className="w-5 h-5" />
-              </button>
-              
-              <h3 className="text-xl font-bold mb-6">Add New Stop</h3>
-              
-              <form onSubmit={handleCreateEntry}>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">City</label>
-                    <input 
-                      type="text" 
-                      value={newEntry.city}
-                      onChange={(e) => setNewEntry({...newEntry, city: e.target.value, content: `Write about your experience in ${e.target.value}...`})}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-white focus:outline-none focus:border-[var(--primary-green)]"
-                      required
-                      placeholder="e.g. Paris"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">Date</label>
-                    <input 
-                      type="date" 
-                      value={newEntry.date}
-                      onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-white focus:outline-none focus:border-[var(--primary-green)]"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3 mt-6">
-                  <button 
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-sm text-gray-400 hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-4 py-2 bg-[var(--primary-green)] text-black font-bold text-sm rounded hover:opacity-90 disabled:opacity-50"
-                  >
-                    {isSubmitting ? 'Adding...' : 'Add Stop'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Create Entry Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h2 className="text-2xl font-bold mb-6">Add New Entry</h2>
+            <form onSubmit={handleCreateEntry} className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">City</label>
+                <input
+                  type="text"
+                  required
+                  value={newEntry.city}
+                  onChange={(e) => setNewEntry({ ...newEntry, city: e.target.value })}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 focus:border-[var(--primary-green)] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Date</label>
+                <input
+                  type="date"
+                  required
+                  value={newEntry.date}
+                  onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 focus:border-[var(--primary-green)] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Initial Thought</label>
+                <textarea
+                  required
+                  value={newEntry.content}
+                  onChange={(e) => setNewEntry({ ...newEntry, content: e.target.value })}
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 h-32 focus:border-[var(--primary-green)] focus:outline-none resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-2 rounded-lg bg-[var(--primary-green)] text-black font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Creating...' : 'Create Entry'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
