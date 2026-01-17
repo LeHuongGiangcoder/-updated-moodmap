@@ -19,7 +19,7 @@ const NavigationBar = () => {
   }, []);
 
   return (
-    <nav className={`w-full px-8 py-4 flex justify-between items-center text-white fixed top-0 left-0 right-0 z-10 transition-colors duration-300 ${scrolled ? 'bg-black/50' : 'bg-black'}`}>
+    <nav className={`w-full px-8 py-4 flex justify-between items-center text-white fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${scrolled ? 'bg-black/50' : 'bg-transparent'}`}>
       <div className="logo">
         <Link href="/" className="logo-font">Moodmap</Link>
       </div>

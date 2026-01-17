@@ -1,7 +1,6 @@
 
 "use client";
 import React, { useState } from 'react';
-import NavigationBar from '../../components/NavigationBar';
 import { useRouter } from 'next/navigation';
 import { Typewriter } from '../../../components/ui/typewriter-text';
 
@@ -77,7 +76,6 @@ const CreateTripPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavigationBar />
       <div className="container mx-auto px-4 pt-24 pb-8">
         <h2 className="text-xl font-regular mb-8 text-center">
           <Typewriter text="Create your new trip..." />

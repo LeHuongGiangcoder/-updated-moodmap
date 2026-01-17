@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import NavigationBar from '../../../components/NavigationBar';
 
 const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
@@ -105,7 +104,6 @@ const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
   if (isLoading || !unwrappedParams) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <NavigationBar />
         <div className="container mx-auto px-4 pt-24 pb-8 flex justify-center items-center">
           <p>Loading trip details...</p>
         </div>
@@ -115,7 +113,6 @@ const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavigationBar />
       <div className="container mx-auto px-4 pt-24 pb-8">
         <h2 className="text-xl font-regular mb-8 text-center">Edit your trip</h2>
         <form onSubmit={handleSubmit} className="max-w-lg mx-auto">

@@ -9,12 +9,29 @@ import Carousel from './components/Carousel';
 
 export default function Home() {
   return (
-    <div className="relative" style={{ background: 'var(--gradient)' }}>
+    <div className="relative bg-black">
       <NavigationBar/>
       <main>
         {/* Hero Section */}
-        <div className="flex flex-col items-center justify-center min-h-screen p-8 pt-20">
-          <div className="text-center text-white w-full max-w-4xl mx-auto">
+        <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
+          {/* Video Background */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-80"
+          >
+            <source src="/assets/hero-background.mp4" type="video/mp4" />
+          </video>
+
+          {/* Overlays */}
+          <div className="absolute inset-0 bg-black/50 z-0 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] z-0 pointer-events-none" />
+
+          {/* Content */}
+          <div className="relative z-10 p-8 pt-20 w-full">
+            <div className="text-center text-white w-full max-w-4xl mx-auto">
             <div className="h-[80px] md:h-[110px] flex items-center justify-center mb-2">
               <GooeyText
                 texts={["Map your journies", "Tell your stories"]}
@@ -32,6 +49,7 @@ export default function Home() {
               <Link href="#features" className="btn-tertiary">Learn more</Link>
             </div>
           </div>
+        </div>
         </div>
 
         {/* Features Section */}
