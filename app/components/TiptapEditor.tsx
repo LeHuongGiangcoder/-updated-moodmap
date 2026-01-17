@@ -2,7 +2,7 @@
 'use client';
 
 import { useEditor, EditorContent } from '@tiptap/react';
-import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
+import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import React, { useEffect } from 'react';
@@ -117,12 +117,7 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
             >
               <Heading2 className="w-4 h-4" />
             </ToolbarButton>
-          </BubbleMenu>
-
-          <FloatingMenu 
-            editor={editor} 
-            className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl"
-          >
+            <div className="w-px h-4 bg-zinc-700 mx-1"></div>
             <ToolbarButton
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               isActive={editor.isActive('bulletList')}
@@ -147,18 +142,12 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
             >
               <Code className="w-4 h-4" />
             </ToolbarButton>
-          </FloatingMenu>
+          </BubbleMenu>
         </>
       )}
 
       <EditorContent editor={editor} />
       
-      {/* Hint text at bottom right */}
-      {editable && (
-        <div className="absolute bottom-2 right-4 text-xs text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          Select text for formatting options
-        </div>
-      )}
     </div>
   );
 };
