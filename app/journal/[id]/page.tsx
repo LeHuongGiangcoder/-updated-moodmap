@@ -443,7 +443,10 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                           <p className="text-xs text-gray-400 mb-1">{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                           <h3 className="font-bold mb-2">{entry.city}</h3>
                           {/* We remove the raw content preview or truncate it safely since it's now HTML */}
-                          <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2" dangerouslySetInnerHTML={{ __html: entry.content || '' }} />
+                          <div 
+                            className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2 overflow-hidden text-ellipsis" 
+                            dangerouslySetInnerHTML={{ __html: entry.content || '' }} 
+                          />
                         </>
                       )}
                     </div>
