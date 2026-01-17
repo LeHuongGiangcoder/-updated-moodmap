@@ -152,42 +152,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
   };
 
-  const handleAddPage = async () => {
-    if (!unwrappedParams?.id) return;
-    setIsSubmitting(true);
-
-    const today = new Date().toISOString().split('T')[0];
-    const newPage = { city: 'New City', date: today, content: 'Write about your day...' };
-
-    try {
-      const response = await fetch('/api/entries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newPage, id: unwrappedParams.id })
-      });
-
-      if (response.ok) {
-        const tripResponse = await fetch(`/api/trips/${unwrappedParams.id}`);
-        const tripData = await tripResponse.json();
-        setTrip(tripData);
-        
-        if (tripData.entries) {
-            const newIndex = tripData.entries.length - 1;
-            setCurrentEntryIndex(newIndex);
-            // Automatically switch to edit mode for the new entry
-            setIsEditing(true);
-            setEditContent(newPage.content);
-        }
-      } else {
-        console.error('Failed to create entry');
-      }
-    } catch (error) {
-      console.error('Error creating entry:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   if (isLoading || !trip) {
     return (
       <div className="min-h-screen bg-black text-white">
@@ -336,13 +300,7 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
               />
             ))}
             
-            <button 
-              onClick={handleAddPage}
-              className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center text-zinc-400 hover:border-[var(--primary-green)] hover:text-[var(--primary-green)] transition-all ml-2 group"
-              title="Add new page"
-            >
-              <Plus className="w-3 h-3 group-hover:scale-110 transition-transform" />
-            </button>
+
 
             <span className="text-xs text-[var(--primary-green)] ml-2 font-bold whitespace-nowrap">
               Page {currentEntryIndex + 1}

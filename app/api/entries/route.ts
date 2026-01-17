@@ -1,34 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const GOOGLE_SHEETS_API_URL = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_API_URL;
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
-  if (!GOOGLE_SHEETS_API_URL) {
-    return NextResponse.json({ error: 'Google Sheets API URL not configured' }, { status: 500 });
-  }
-
   try {
     const body = await req.json();
     console.log('Creating entry with body:', body);
 
-    // Call Google Script with type='entry'
-    // Note: The Google Script expects the 'type' param in the query string for 'create' action
-    const response = await fetch(`${GOOGLE_SHEETS_API_URL}?action=create&type=entry`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    // The client sends 'id' as the tripId for creation
+    const { id: tripId, city, date, content } = body;
+
+    if (!tripId) {
+      return NextResponse.json({ error: 'Trip ID is required' }, { status: 400 });
+    }
+
+    const entry = await prisma.entry.create({
+      data: {
+        tripId,
+        city,
+        date,
+        content,
       },
-      body: JSON.stringify(body),
     });
 
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      return NextResponse.json(result, { status: 201 });
-    } else {
-      console.error('Failed to create entry:', result.error);
-      return NextResponse.json({ error: result.error || 'Failed to create entry' }, { status: 500 });
-    }
+    console.log('Entry created successfully:', entry);
+    
+    // Return format matching what the client expects
+    return NextResponse.json({ status: 'success', data: entry }, { status: 201 });
   } catch (error) {
     console.error('Error creating entry:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -36,27 +33,27 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!GOOGLE_SHEETS_API_URL) {
-    return NextResponse.json({ error: 'Google Sheets API URL not configured' }, { status: 500 });
-  }
-
   try {
     const body = await req.json();
     console.log('Updating entry with body:', body);
 
-    const response = await fetch(`${GOOGLE_SHEETS_API_URL}?action=update&type=entry`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+    // The client sends 'id' as the entryId for update
+    const { id, content, city, date } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Entry ID is required' }, { status: 400 });
+    }
+
+    const entry = await prisma.entry.update({
+      where: { id },
+      data: {
+        content,
+        ...(city && { city }),
+        ...(date && { date }),
+      },
     });
 
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      return NextResponse.json(result, { status: 200 });
-    } else {
-      return NextResponse.json({ error: result.error || 'Failed to update entry' }, { status: 500 });
-    }
+    return NextResponse.json({ status: 'success', data: entry }, { status: 200 });
   } catch (error) {
     console.error('Failed to update entry:', error);
     return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
