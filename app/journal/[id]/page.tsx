@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import TiptapEditor from '../../components/TiptapEditor';
 import MapboxMap from '../../components/MapboxMap';
@@ -11,15 +11,8 @@ import {
   PanelRightOpen, 
   MapPin, 
   Calendar, 
-  MoreVertical, 
   Plus,
-  Settings,
-  User,
   PanelLeftClose,
-  CloudSun,
-  Check,
-  Loader2,
-  AlertCircle,
   ChevronLeft
 } from 'lucide-react';
 
@@ -55,7 +48,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [newEntry, setNewEntry] = useState({ city: '', date: '', content: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editContent, setEditContent] = useState('');
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   
   // Edit & Context Menu State
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
@@ -112,11 +104,9 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     
     // Don't save if content hasn't changed from what's in the DB/state
     if (editContent === currentEntry.content) {
-        setSaveStatus('saved');
         return;
     }
 
-    setSaveStatus('saving');
     const timeoutId = setTimeout(() => {
       handleUpdateContent(editContent);
     }, 1500); // 1.5s debounce
@@ -138,7 +128,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
         });
 
         if (response.ok) {
-            setSaveStatus('saved');
             // Update local state to match saved content
             setTrip(prev => {
                 if (!prev || !prev.entries) return prev;
@@ -150,11 +139,9 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 return { ...prev, entries: updatedEntries };
             });
         } else {
-            setSaveStatus('error');
             console.error('Failed to update content');
         }
     } catch (error) {
-        setSaveStatus('error');
         console.error('Error updating content:', error);
     }
   };
@@ -352,12 +339,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-64 border border-zinc-800 rounded-xl bg-zinc-900/20">
                    <p className="text-gray-400 mb-4">{trip.description || "Start your journey by adding a new city!"}</p>
-                   <button 
-                     onClick={() => setIsModalOpen(true)}
-                     className="btn-primary flex items-center gap-2"
-                   >
-                     <Plus className="w-4 h-4" /> Add First Entry
-                   </button>
                 </div>
               )}
             </div>
