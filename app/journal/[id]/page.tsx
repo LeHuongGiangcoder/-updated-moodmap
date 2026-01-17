@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import NavigationBar from '../../components/NavigationBar';
+import Link from 'next/link';
 import TiptapEditor from '../../components/TiptapEditor';
 import MapboxMap from '../../components/MapboxMap';
 import { 
@@ -18,7 +18,8 @@ import {
   CloudSun,
   Check,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft
 } from 'lucide-react';
 
 interface Entry {
@@ -186,7 +187,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
   if (isLoading || !trip) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <NavigationBar />
         <div className="container mx-auto px-4 pt-24 pb-8 flex justify-center items-center">
           <div className="animate-pulse flex flex-col items-center">
             <div className="h-4 bg-zinc-800 w-48 mb-4 rounded"></div>
@@ -199,11 +199,14 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <div className="min-h-screen bg-[#090e14] text-white overflow-hidden flex flex-col">
-      <NavigationBar />
       
       {/* Header Bar */}
-      <div className="pt-20 px-6 pb-4 border-b border-zinc-800 flex justify-between items-center bg-[#090e14] z-20">
+      <div className="pt-6 px-6 pb-4 border-b border-zinc-800 flex justify-between items-center bg-[#090e14] z-20">
         <div>
+          <Link href="/library" className="inline-flex items-center text-gray-400 hover:text-white mb-4 transition-colors group">
+            <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">Back to Library</span>
+          </Link>
           <p className="text-sm text-[var(--primary-pink)] font-medium mb-1">TRIP BY {trip.author.toUpperCase()}</p>
           <h1 className="text-3xl font-bold font-['Geomanist']">{trip.title}</h1>
         </div>
@@ -223,12 +226,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
               <p className="font-bold text-lg">{trip.duration}</p>
             </div>
           </div>
-          <button className="p-2 hover:bg-zinc-800 rounded-full transition-colors">
-            <Settings className="w-5 h-5 text-gray-400" />
-          </button>
-          <button className="p-2 hover:bg-zinc-800 rounded-full transition-colors">
-            <User className="w-5 h-5 text-gray-400" />
-          </button>
         </div>
       </div>
 
@@ -272,13 +269,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     
                     {/* Save Status Indicator */}
                     {/* Removed as per request to reduce distraction */}
-                  </div>
-                </div>
-                <div className="bg-zinc-900/50 p-3 rounded-lg flex items-center gap-3">
-                  <CloudSun className="w-8 h-8 text-blue-400" />
-                  <div>
-                    <p className="font-bold">12°C</p>
-                    <p className="text-xs text-gray-400">Partly Cloudy</p>
                   </div>
                 </div>
               </div>
