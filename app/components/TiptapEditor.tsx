@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useEditor, EditorContent, BubbleMenu, FloatingMenu } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import React, { useEffect } from 'react';
@@ -89,7 +90,6 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
         <>
           <BubbleMenu 
             editor={editor} 
-            tippyOptions={{ duration: 100 }}
             className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl"
           >
             <ToolbarButton
@@ -121,7 +121,6 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
 
           <FloatingMenu 
             editor={editor} 
-            tippyOptions={{ duration: 100 }}
             className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl"
           >
             <ToolbarButton
