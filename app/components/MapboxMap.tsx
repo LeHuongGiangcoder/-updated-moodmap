@@ -81,26 +81,49 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
       }
 
       setCoordinates(coords);
-
-      // Fit bounds if we have coordinates
-      if (coords.length > 0) {
-        // Simple centering logic - can be improved with fitBounds
-        // For now, just center on the first one or average
-        const avgLng = coords.reduce((sum, c) => sum + c.lng, 0) / coords.length;
-        const avgLat = coords.reduce((sum, c) => sum + c.lat, 0) / coords.length;
-        
-        setViewState({
-          longitude: avgLng,
-          latitude: avgLat,
-          zoom: coords.length > 1 ? 3 : 8
-        });
-      }
-
       setIsLoading(false);
     };
 
     fetchCoordinates();
   }, [entries, tripLocation]);
+
+  // Auto-zoom to fit bounds when coordinates change
+  useEffect(() => {
+    if (coordinates.length === 0 || !mapRef.current) return;
+
+    // Calculate bounds
+    const minLng = Math.min(...coordinates.map(c => c.lng));
+    const maxLng = Math.max(...coordinates.map(c => c.lng));
+    const minLat = Math.min(...coordinates.map(c => c.lat));
+    const maxLat = Math.max(...coordinates.map(c => c.lat));
+
+    // If only one point, center on it with fixed zoom
+    if (coordinates.length === 1) {
+      mapRef.current.flyTo({
+        center: [minLng, minLat],
+        zoom: 10,
+        duration: 2000
+      });
+      return;
+    }
+
+    // Fit bounds with padding
+    try {
+      mapRef.current.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat]
+        ],
+        {
+          padding: 50,
+          duration: 2000
+        }
+      );
+    } catch (error) {
+      console.error("Error fitting bounds:", error);
+    }
+
+  }, [coordinates]);
 
   // Force map resize when container size changes or after mount
   useEffect(() => {
