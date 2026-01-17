@@ -250,7 +250,7 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
 
         {/* Main Content Area */}
-        <div className={`transition-all duration-300 ease-in-out relative ${showMap ? 'w-0 p-0 overflow-hidden opacity-0' : 'flex-1 overflow-y-auto p-8 opacity-100'}`}>
+        <div className={`transition-all duration-300 ease-in-out relative ${showMap ? 'w-0 p-0 overflow-hidden opacity-0 pointer-events-none' : 'flex-1 overflow-y-auto p-6 opacity-100'}`}>
           <div className="max-w-4xl mx-auto">
             {/* Entry Header */}
             <div className="mb-8">
