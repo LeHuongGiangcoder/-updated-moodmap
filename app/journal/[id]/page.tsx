@@ -120,10 +120,16 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     setIsSubmitting(true);
 
     try {
+      const entryToCreate = {
+        ...newEntry,
+        content: newEntry.content || 'Write about your day...',
+        id: unwrappedParams.id
+      };
+
       const response = await fetch('/api/entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...newEntry, id: unwrappedParams.id })
+        body: JSON.stringify(entryToCreate)
       });
 
       if (response.ok) {
@@ -135,6 +141,42 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
         setIsModalOpen(false);
         if (tripData.entries) {
             setCurrentEntryIndex(tripData.entries.length - 1);
+        }
+      } else {
+        console.error('Failed to create entry');
+      }
+    } catch (error) {
+      console.error('Error creating entry:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAddPage = async () => {
+    if (!unwrappedParams?.id) return;
+    setIsSubmitting(true);
+
+    const today = new Date().toISOString().split('T')[0];
+    const newPage = { city: 'New City', date: today, content: 'Write about your day...' };
+
+    try {
+      const response = await fetch('/api/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...newPage, id: unwrappedParams.id })
+      });
+
+      if (response.ok) {
+        const tripResponse = await fetch(`/api/trips/${unwrappedParams.id}`);
+        const tripData = await tripResponse.json();
+        setTrip(tripData);
+        
+        if (tripData.entries) {
+            const newIndex = tripData.entries.length - 1;
+            setCurrentEntryIndex(newIndex);
+            // Automatically switch to edit mode for the new entry
+            setIsEditing(true);
+            setEditContent(newPage.content);
         }
       } else {
         console.error('Failed to create entry');
@@ -282,12 +324,29 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
           {/* Bottom Navigation */}
           <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-zinc-900/90 backdrop-blur-sm px-6 py-3 rounded-full border border-zinc-800 flex items-center gap-4 z-30">
-            <button className="w-2 h-2 rounded-full bg-zinc-600 hover:bg-[var(--primary-green)] transition-colors"></button>
-            <button className="w-2 h-2 rounded-full bg-zinc-600 hover:bg-[var(--primary-green)] transition-colors"></button>
-            <button className="w-3 h-3 rounded-full bg-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]"></button>
-            <button className="w-2 h-2 rounded-full bg-zinc-600 hover:bg-[var(--primary-green)] transition-colors"></button>
-            <button className="w-2 h-2 rounded-full bg-zinc-600 hover:bg-[var(--primary-green)] transition-colors"></button>
-            <span className="text-xs text-[var(--primary-green)] ml-2 font-bold">Page 3</span>
+            {trip.entries?.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentEntryIndex(index)}
+                className={`rounded-full transition-all duration-300 ${
+                  index === currentEntryIndex
+                    ? 'w-3 h-3 bg-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]'
+                    : 'w-2 h-2 bg-zinc-600 hover:bg-[var(--primary-green)]'
+                }`}
+              />
+            ))}
+            
+            <button 
+              onClick={handleAddPage}
+              className="w-5 h-5 rounded-full border border-zinc-600 flex items-center justify-center text-zinc-400 hover:border-[var(--primary-green)] hover:text-[var(--primary-green)] transition-all ml-2 group"
+              title="Add new page"
+            >
+              <Plus className="w-3 h-3 group-hover:scale-110 transition-transform" />
+            </button>
+
+            <span className="text-xs text-[var(--primary-green)] ml-2 font-bold whitespace-nowrap">
+              Page {currentEntryIndex + 1}
+            </span>
           </div>
         </div>
 
@@ -371,15 +430,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 focus:border-[var(--primary-green)] focus:outline-none"
                 />
               </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Initial Thought</label>
-                <textarea
-                  required
-                  value={newEntry.content}
-                  onChange={(e) => setNewEntry({ ...newEntry, content: e.target.value })}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 h-32 focus:border-[var(--primary-green)] focus:outline-none resize-none"
-                />
-              </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -393,7 +443,7 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                   disabled={isSubmitting}
                   className="flex-1 py-2 rounded-lg bg-[var(--primary-green)] text-black font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Entry'}
+                  {isSubmitting ? 'Creating...' : 'Add'}
                 </button>
               </div>
             </form>
