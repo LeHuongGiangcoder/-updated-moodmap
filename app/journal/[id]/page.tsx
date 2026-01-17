@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import TiptapEditor from '../../components/TiptapEditor';
 import MapboxMap from '../../components/MapboxMap';
+import CityAutocomplete from '../../components/CityAutocomplete';
 import { 
   Map, 
   PanelRightClose, 
@@ -420,10 +421,9 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     >
                       {editingEntryId === entry.id ? (
                         <div className="space-y-2 mb-2 bg-zinc-900/80 p-2 rounded-lg border border-zinc-700" onClick={(e) => e.stopPropagation()}>
-                           <input 
-                             type="text" 
+                           <CityAutocomplete
                              value={editEntryData.city}
-                             onChange={(e) => setEditEntryData({...editEntryData, city: e.target.value})}
+                             onChange={(val) => setEditEntryData(prev => ({...prev, city: val}))}
                              className="w-full bg-zinc-800 px-2 py-1 rounded text-sm border border-zinc-700 focus:border-[var(--primary-green)] outline-none"
                              autoFocus
                            />
@@ -492,12 +492,12 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <form onSubmit={handleCreateEntry} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">City</label>
-                <input
-                  type="text"
-                  required
+                <CityAutocomplete
                   value={newEntry.city}
-                  onChange={(e) => setNewEntry({ ...newEntry, city: e.target.value })}
+                  onChange={(val) => setNewEntry(prev => ({ ...prev, city: val }))}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2 focus:border-[var(--primary-green)] focus:outline-none"
+                  placeholder="Enter city name..."
+                  autoFocus
                 />
               </div>
               <div>
