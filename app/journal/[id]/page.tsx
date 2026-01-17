@@ -267,7 +267,7 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     <div className="min-h-screen bg-[#090e14] text-white overflow-hidden flex flex-col">
       
       {/* Header Bar */}
-      <div className="pt-6 px-6 pb-4 border-b border-zinc-800 flex justify-between items-center bg-[#090e14] z-20">
+      <div className="pt-10 px-6 pb-4 border-b border-zinc-800 flex justify-between items-center bg-[#090e14] z-20">
         <div>
           <Link href="/library" className="inline-flex items-center text-gray-400 hover:text-white mb-4 transition-colors group">
             <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />

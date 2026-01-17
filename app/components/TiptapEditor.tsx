@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, BubbleMenu, FloatingMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import React, { useEffect } from 'react';
@@ -84,65 +84,82 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
   }
 
   return (
-    <div className="w-full border border-zinc-800 rounded-xl overflow-hidden bg-[#0b1016]/50">
-      {/* Fixed Toolbar */}
+    <div className="w-full border border-zinc-800 rounded-xl overflow-hidden bg-[#0b1016]/50 relative group">
       {editable && (
-        <div className="bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800 p-2 flex gap-1 flex-wrap sticky top-0 z-10">
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            isActive={editor.isActive('bold')}
+        <>
+          <BubbleMenu 
+            editor={editor} 
+            tippyOptions={{ duration: 100 }}
+            className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl"
           >
-            <Bold className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            isActive={editor.isActive('italic')}
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              isActive={editor.isActive('bold')}
+            >
+              <Bold className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              isActive={editor.isActive('italic')}
+            >
+              <Italic className="w-4 h-4" />
+            </ToolbarButton>
+            <div className="w-px h-4 bg-zinc-700 mx-1"></div>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              isActive={editor.isActive('heading', { level: 1 })}
+            >
+              <Heading1 className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              isActive={editor.isActive('heading', { level: 2 })}
+            >
+              <Heading2 className="w-4 h-4" />
+            </ToolbarButton>
+          </BubbleMenu>
+
+          <FloatingMenu 
+            editor={editor} 
+            tippyOptions={{ duration: 100 }}
+            className="flex items-center gap-1 p-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl"
           >
-            <Italic className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-zinc-700 mx-1 self-center" />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            isActive={editor.isActive('heading', { level: 1 })}
-          >
-            <Heading1 className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            isActive={editor.isActive('heading', { level: 2 })}
-          >
-            <Heading2 className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-zinc-700 mx-1 self-center" />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            isActive={editor.isActive('bulletList')}
-          >
-            <List className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            isActive={editor.isActive('orderedList')}
-          >
-            <ListOrdered className="w-4 h-4" />
-          </ToolbarButton>
-          <div className="w-px h-6 bg-zinc-700 mx-1 self-center" />
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            isActive={editor.isActive('blockquote')}
-          >
-            <Quote className="w-4 h-4" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            isActive={editor.isActive('code')}
-          >
-            <Code className="w-4 h-4" />
-          </ToolbarButton>
-        </div>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              isActive={editor.isActive('bulletList')}
+            >
+              <List className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              isActive={editor.isActive('orderedList')}
+            >
+              <ListOrdered className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              isActive={editor.isActive('blockquote')}
+            >
+              <Quote className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              isActive={editor.isActive('codeBlock')}
+            >
+              <Code className="w-4 h-4" />
+            </ToolbarButton>
+          </FloatingMenu>
+        </>
       )}
 
       <EditorContent editor={editor} />
+      
+      {/* Hint text at bottom right */}
+      {editable && (
+        <div className="absolute bottom-2 right-4 text-xs text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          Select text for formatting options
+        </div>
+      )}
     </div>
   );
 };
