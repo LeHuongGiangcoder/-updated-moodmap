@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import TripCard from '../components/TripCard';
-import NavigationBar from '../components/NavigationBar';
+import { ChevronLeft } from 'lucide-react';
 
 interface Trip {
   id: string;
@@ -47,8 +47,13 @@ const LibraryPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavigationBar />
-      <div className="container mx-auto px-4 pt-24 pb-8">
+      <div className="container mx-auto px-4 pt-10 pb-8">
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center text-gray-400 hover:text-white transition-colors group">
+            <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-medium">Back to Home</span>
+          </Link>
+        </div>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Trips</h1>
           <Link href="/trip/create" className="btn-primary">

@@ -59,3 +59,23 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Entry ID is required' }, { status: 400 });
+    }
+
+    await prisma.entry.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ status: 'success' }, { status: 200 });
+  } catch (error) {
+    console.error('Failed to delete entry:', error);
+    return NextResponse.json({ error: 'Failed to delete entry' }, { status: 500 });
+  }
+}

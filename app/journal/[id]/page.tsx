@@ -55,6 +55,11 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  
+  // Edit & Context Menu State
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editEntryData, setEditEntryData] = useState<{ city: string; date: string }>({ city: '', date: '' });
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; entryId: string } | null>(null);
 
   // Derived State
   const currentEntry = trip?.entries?.[currentEntryIndex];
@@ -92,6 +97,13 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     fetchTrip();
   }, [unwrappedParams]);
+
+  // Close context menu on click outside
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Debounce autosave
   useEffect(() => {
@@ -182,6 +194,60 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleUpdateEntry = async (id: string) => {
+    try {
+      const response = await fetch('/api/entries', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id, 
+          city: editEntryData.city, 
+          date: editEntryData.date 
+        })
+      });
+
+      if (response.ok) {
+        setTrip(prev => {
+            if (!prev || !prev.entries) return prev;
+            return {
+                ...prev,
+                entries: prev.entries.map(e => e.id === id ? { ...e, ...editEntryData } : e)
+            };
+        });
+        setEditingEntryId(null);
+      }
+    } catch (error) {
+      console.error('Error updating entry:', error);
+    }
+  };
+
+  const handleDeleteEntry = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this city?')) return;
+    
+    try {
+      const response = await fetch(`/api/entries?id=${id}`, { method: 'DELETE' });
+      
+      if (response.ok) {
+        setTrip(prev => {
+            if (!prev || !prev.entries) return prev;
+            const newEntries = prev.entries.filter(e => e.id !== id);
+            // Adjust current index if needed
+            if (currentEntryIndex >= newEntries.length) {
+                setCurrentEntryIndex(Math.max(0, newEntries.length - 1));
+            }
+            return { ...prev, entries: newEntries };
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, entryId: string) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, entryId });
   };
 
   if (isLoading || !trip) {
@@ -345,15 +411,63 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     ></button>
                     
                     <div className={`group cursor-pointer transition-all ${index === currentEntryIndex ? 'opacity-100' : 'opacity-60 hover:opacity-80'}`}
-                         onClick={() => setCurrentEntryIndex(index)}>
-                      <p className="text-xs text-gray-400 mb-1">{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                      <h3 className="font-bold mb-2">{entry.city}</h3>
-                      {/* We remove the raw content preview or truncate it safely since it's now HTML */}
-                      <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2" dangerouslySetInnerHTML={{ __html: entry.content || '' }} />
+                         onClick={() => setCurrentEntryIndex(index)}
+                         onDoubleClick={() => {
+                             setEditingEntryId(entry.id);
+                             setEditEntryData({ city: entry.city, date: entry.date.split('T')[0] });
+                         }}
+                         onContextMenu={(e) => handleContextMenu(e, entry.id)}
+                    >
+                      {editingEntryId === entry.id ? (
+                        <div className="space-y-2 mb-2 bg-zinc-900/80 p-2 rounded-lg border border-zinc-700" onClick={(e) => e.stopPropagation()}>
+                           <input 
+                             type="text" 
+                             value={editEntryData.city}
+                             onChange={(e) => setEditEntryData({...editEntryData, city: e.target.value})}
+                             className="w-full bg-zinc-800 px-2 py-1 rounded text-sm border border-zinc-700 focus:border-[var(--primary-green)] outline-none"
+                             autoFocus
+                           />
+                           <input 
+                             type="date" 
+                             value={editEntryData.date}
+                             onChange={(e) => setEditEntryData({...editEntryData, date: e.target.value})}
+                             className="w-full bg-zinc-800 px-2 py-1 rounded text-sm border border-zinc-700 focus:border-[var(--primary-green)] outline-none"
+                           />
+                           <div className="flex gap-2 justify-end">
+                             <button onClick={() => setEditingEntryId(null)} className="text-xs text-gray-400 hover:text-white px-2 py-1">Cancel</button>
+                             <button onClick={() => handleUpdateEntry(entry.id)} className="text-xs bg-[var(--primary-green)] text-black font-bold px-2 py-1 rounded">Save</button>
+                           </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-xs text-gray-400 mb-1">{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                          <h3 className="font-bold mb-2">{entry.city}</h3>
+                          {/* We remove the raw content preview or truncate it safely since it's now HTML */}
+                          <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2" dangerouslySetInnerHTML={{ __html: entry.content || '' }} />
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
+              
+              {/* Context Menu */}
+              {contextMenu && (
+                <div 
+                  className="fixed bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-50 py-1 min-w-[120px]"
+                  style={{ top: contextMenu.y, left: contextMenu.x }}
+                >
+                  <button 
+                    onClick={() => {
+                        handleDeleteEntry(contextMenu.entryId);
+                        setContextMenu(null);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-800 transition-colors"
+                  >
+                    Delete City
+                  </button>
+                </div>
+              )}
 
               <button 
                 onClick={() => setIsModalOpen(true)}
