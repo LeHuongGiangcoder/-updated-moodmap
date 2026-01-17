@@ -25,6 +25,7 @@ interface Coordinate {
 }
 
 const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
+  const mapRef = useRef<MapRef>(null);
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 0,
@@ -101,6 +102,30 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
     fetchCoordinates();
   }, [entries, tripLocation]);
 
+  // Force map resize when container size changes or after mount
+  useEffect(() => {
+    // Delay resize to allow CSS transition to complete
+    const timeoutId = setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.resize();
+      }
+    }, 350); // Slightly longer than the 300ms transition duration
+
+    return () => clearTimeout(timeoutId);
+  }, []); // Run on mount
+
+  // Also listen for window resize just in case
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapRef.current) {
+        mapRef.current.resize();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Create GeoJSON for the line connecting points
   const geojson = useMemo(() => {
     return {
@@ -125,6 +150,7 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
     <div className="h-full w-full relative">
       <Map
         {...viewState}
+        ref={mapRef}
         onMove={evt => setViewState(evt.viewState)}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/dark-v11"
