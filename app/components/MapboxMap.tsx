@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import Map, { Marker, Source, Layer, NavigationControl } from 'react-map-gl/mapbox';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import Map, { Marker, Source, Layer, NavigationControl, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
 
