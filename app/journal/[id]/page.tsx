@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import NavigationBar from '../../components/NavigationBar';
+import TiptapEditor from '../../components/TiptapEditor';
+import MapboxMap from '../../components/MapboxMap';
 import { 
   Map, 
   PanelRightClose, 
@@ -13,7 +15,10 @@ import {
   Settings,
   User,
   PanelLeftClose,
-  CloudSun
+  CloudSun,
+  Check,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 interface Entry {
@@ -47,8 +52,8 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newEntry, setNewEntry] = useState({ city: '', date: '', content: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
 
   // Derived State
   const currentEntry = trip?.entries?.[currentEntryIndex];
@@ -87,14 +92,26 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     fetchTrip();
   }, [unwrappedParams]);
 
-  const handleUpdateContent = async () => {
-    if (!currentEntry || !unwrappedParams?.id) return;
+  // Debounce autosave
+  useEffect(() => {
+    if (!currentEntry) return;
     
-    // Optimistic update
-    const updatedEntries = [...(trip?.entries || [])];
-    updatedEntries[currentEntryIndex] = { ...currentEntry, content: editContent };
-    setTrip(prev => prev ? { ...prev, entries: updatedEntries } : null);
-    setIsEditing(false);
+    // Don't save if content hasn't changed from what's in the DB/state
+    if (editContent === currentEntry.content) {
+        setSaveStatus('saved');
+        return;
+    }
+
+    setSaveStatus('saving');
+    const timeoutId = setTimeout(() => {
+      handleUpdateContent(editContent);
+    }, 1500); // 1.5s debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [editContent, currentEntry]);
+
+  const handleUpdateContent = async (contentToSave: string) => {
+    if (!currentEntry || !unwrappedParams?.id) return;
 
     try {
         const response = await fetch('/api/entries', {
@@ -102,14 +119,28 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 id: currentEntry.id, 
-                content: editContent,
+                content: contentToSave,
             })
         });
 
-        if (!response.ok) {
+        if (response.ok) {
+            setSaveStatus('saved');
+            // Update local state to match saved content
+            setTrip(prev => {
+                if (!prev || !prev.entries) return prev;
+                const updatedEntries = [...prev.entries];
+                updatedEntries[currentEntryIndex] = { 
+                    ...updatedEntries[currentEntryIndex], 
+                    content: contentToSave 
+                };
+                return { ...prev, entries: updatedEntries };
+            });
+        } else {
+            setSaveStatus('error');
             console.error('Failed to update content');
         }
     } catch (error) {
+        setSaveStatus('error');
         console.error('Error updating content:', error);
     }
   };
@@ -122,7 +153,7 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
     try {
       const entryToCreate = {
         ...newEntry,
-        content: newEntry.content || 'Write about your day...',
+        content: newEntry.content || '<p>Write about your day...</p>',
         id: unwrappedParams.id
       };
 
@@ -212,15 +243,15 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
           </button>
           
           {showMap && (
-            <div className="h-full w-full bg-zinc-900 flex items-center justify-center">
-              <p className="text-gray-500">Interactive Map Placeholder</p>
+            <div className="h-full w-full bg-zinc-900 flex items-center justify-center overflow-hidden">
+              <MapboxMap entries={trip.entries} tripLocation={trip.location} />
             </div>
           )}
         </div>
 
         {/* Main Content Area */}
         <div className={`transition-all duration-300 ease-in-out relative ${showMap ? 'w-0 p-0 overflow-hidden opacity-0' : 'flex-1 overflow-y-auto p-8 opacity-100'}`}>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             {/* Entry Header */}
             <div className="mb-8">
               <div className="flex justify-between items-start mb-4">
@@ -238,6 +269,9 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                       </>
                     )}
                     <span>{trip.author}</span>
+                    
+                    {/* Save Status Indicator */}
+                    {/* Removed as per request to reduce distraction */}
                   </div>
                 </div>
                 <div className="bg-zinc-900/50 p-3 rounded-lg flex items-center gap-3">
@@ -250,62 +284,47 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
               </div>
             </div>
 
-            {/* Entry Content */}
-            <div className="prose prose-invert max-w-none relative group">
-               {isEditing ? (
-                   <div className="mb-6">
-                       <textarea 
-                           value={editContent}
-                           onChange={(e) => setEditContent(e.target.value)}
-                           className="w-full bg-zinc-900/50 border border-zinc-700 rounded-lg p-4 text-gray-300 leading-relaxed whitespace-pre-wrap focus:outline-none focus:border-[var(--primary-green)] min-h-[200px]"
-                           autoFocus
-                       />
-                       <div className="flex gap-2 justify-end mt-2">
-                           <button onClick={() => setIsEditing(false)} className="text-sm text-gray-400 hover:text-white">Cancel</button>
-                           <button onClick={handleUpdateContent} className="text-sm bg-[var(--primary-green)] text-black font-bold px-4 py-1 rounded hover:opacity-90">Save</button>
-                       </div>
-                   </div>
-               ) : (
-                   <div onClick={() => currentEntry && setIsEditing(true)} className="cursor-pointer rounded-lg p-2 -ml-2 hover:bg-zinc-900/30 transition-colors border border-transparent hover:border-zinc-800/50 relative group/edit">
-                       <p className="text-gray-300 leading-relaxed mb-6 whitespace-pre-wrap">
-                         {currentEntry ? currentEntry.content : (trip.description || "No content available for this entry.")}
-                       </p>
-                       {currentEntry && (
-                           <div className="absolute top-2 right-2 opacity-0 group-hover/edit:opacity-100 transition-opacity">
-                               <span className="text-xs text-gray-500 bg-black/50 px-2 py-1 rounded">Click to edit</span>
-                           </div>
-                       )}
-                   </div>
-               )}
-              
-              {!currentEntry && (
-                <p className="text-gray-300 leading-relaxed mb-8">
-                  {trip.description || "Start adding your journey details!"}
-                </p>
+            {/* Entry Content (Rich Text Editor) */}
+            <div className="min-h-[500px] mb-20">
+              {currentEntry ? (
+                <TiptapEditor 
+                  content={editContent} 
+                  onChange={setEditContent} 
+                  editable={true}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-64 border border-zinc-800 rounded-xl bg-zinc-900/20">
+                   <p className="text-gray-400 mb-4">{trip.description || "Start your journey by adding a new city!"}</p>
+                   <button 
+                     onClick={() => setIsModalOpen(true)}
+                     className="btn-primary flex items-center gap-2"
+                   >
+                     <Plus className="w-4 h-4" /> Add First Entry
+                   </button>
+                </div>
               )}
             </div>
           </div>
 
           {/* Bottom Navigation */}
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-zinc-900/90 backdrop-blur-sm px-6 py-3 rounded-full border border-zinc-800 flex items-center gap-4 z-30">
-            {trip.entries?.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentEntryIndex(index)}
-                className={`rounded-full transition-all duration-300 ${
-                  index === currentEntryIndex
-                    ? 'w-3 h-3 bg-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]'
-                    : 'w-2 h-2 bg-zinc-600 hover:bg-[var(--primary-green)]'
-                }`}
-              />
-            ))}
-            
-
-
-            <span className="text-xs text-[var(--primary-green)] ml-2 font-bold whitespace-nowrap">
-              Page {currentEntryIndex + 1}
-            </span>
-          </div>
+          {trip.entries && trip.entries.length > 0 && (
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-zinc-900/90 backdrop-blur-sm px-6 py-3 rounded-full border border-zinc-800 flex items-center gap-4 z-30">
+                {trip.entries.map((_, index) => (
+                <button
+                    key={index}
+                    onClick={() => setCurrentEntryIndex(index)}
+                    className={`rounded-full transition-all duration-300 ${
+                    index === currentEntryIndex
+                        ? 'w-3 h-3 bg-[var(--primary-green)] shadow-[0_0_10px_var(--primary-green)]'
+                        : 'w-2 h-2 bg-zinc-600 hover:bg-[var(--primary-green)]'
+                    }`}
+                />
+                ))}
+                <span className="text-xs text-[var(--primary-green)] ml-2 font-bold whitespace-nowrap">
+                Page {currentEntryIndex + 1}
+                </span>
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar / Timeline */}
@@ -321,9 +340,6 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <div className="h-full overflow-y-auto p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold font-['Geomanist']">Itinerary</h2>
-                <button className="p-1 hover:bg-zinc-800 rounded transition-colors">
-                  <MoreVertical className="w-5 h-5 text-gray-400" />
-                </button>
               </div>
 
               <div className="space-y-6 relative before:absolute before:left-[7px] before:top-2 before:bottom-0 before:w-0.5 before:bg-zinc-800">
@@ -342,9 +358,8 @@ const JournalPage = ({ params }: { params: Promise<{ id: string }> }) => {
                          onClick={() => setCurrentEntryIndex(index)}>
                       <p className="text-xs text-gray-400 mb-1">{new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                       <h3 className="font-bold mb-2">{entry.city}</h3>
-                      <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2">
-                        {entry.content}
-                      </div>
+                      {/* We remove the raw content preview or truncate it safely since it's now HTML */}
+                      <div className="bg-zinc-900/50 p-3 rounded-lg text-sm text-gray-400 line-clamp-2" dangerouslySetInnerHTML={{ __html: entry.content || '' }} />
                     </div>
                   </div>
                 ))}
