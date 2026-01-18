@@ -4,7 +4,8 @@ import NavigationBar from './components/NavigationBar';
 import Link from 'next/link';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { GooeyText } from '@/components/ui/gooey-text-morphing';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube } from 'react-icons/fa';
+import AnimatedShaderBackground from '@/components/ui/animated-shader-background';
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPlay, FaArrowRight } from 'react-icons/fa';
 import Carousel from './components/Carousel';
 
 export default function Home() {
@@ -14,42 +15,50 @@ export default function Home() {
       <main>
         {/* Hero Section */}
         <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
-          {/* Video Background */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-80"
-          >
-            <source src="/assets/hero-background.mp4" type="video/mp4" />
-          </video>
-
-          {/* Overlays */}
-          <div className="absolute inset-0 bg-black/50 z-0 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)] z-0 pointer-events-none" />
-
-          {/* Content */}
-          <div className="relative z-10 p-8 pt-20 w-full">
-            <div className="text-center text-white w-full max-w-4xl mx-auto">
-            <div className="h-[80px] md:h-[110px] flex items-center justify-center mb-2">
-              <GooeyText
-                texts={["Map your journies", "Tell your stories"]}
-                morphTime={0.6}
-                cooldownTime={1.5}
-                className="font-bold"
-                textClassName="text-white text-4xl md:text-7xl whitespace-nowrap font-['Geomanist'] tracking-tight"
-              />
+          <AnimatedShaderBackground className="flex flex-col items-center justify-center">
+            {/* Background Gradient Mesh */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+              <div className="absolute top-[-20%] left-[20%] w-[500px] h-[500px] bg-[var(--primary-pink)] rounded-full opacity-10 blur-[120px]" />
+              <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-[var(--primary-green)] rounded-full opacity-10 blur-[100px]" />
             </div>
-            <p className="text-normal md:text-xl opacity-90 font-light tracking-wide max-w-2xl mx-auto">
-                Create and share beautiful maps of your life&apos;s moments.
-            </p>
-            <div className="mt-8 flex justify-center gap-4">
-              <Link href="/library" className="btn-primary">Get started</Link>
-              <Link href="#features" className="btn-tertiary">Learn more</Link>
+
+            {/* Content */}
+            <div className="relative z-10 p-8 pt-20 w-full">
+              <div className="text-center text-white w-full max-w-5xl mx-auto flex flex-col items-center">
+
+                {/* Headline */}
+                <div className="h-[120px] md:h-[180px] flex items-center justify-center mb-6 w-full">
+                  <GooeyText
+                    texts={["Map your journeys", "Tell your stories"]}
+                    morphTime={0.6}
+                    cooldownTime={2.5}
+                    className="font-bold w-full"
+                    textClassName="text-white text-5xl md:text-8xl whitespace-nowrap font-['Geomanist'] tracking-tight font-bold leading-tight"
+                  />
+                </div>
+
+                {/* Subheadline */}
+                <p className="text-lg md:text-xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto mb-10 leading-relaxed">
+                  Create and share beautiful maps of your life&apos;s moments.
+                  <br className="hidden md:block" />
+                  Visualize your memories in a 3D space designed for explorers.
+                </p>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                  <Link href="/library" className="btn-primary group">
+                    Start Mapping 
+                    <FaArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <Link href="#demo" className="btn-secondary group">
+                    <FaPlay className="mr-2 w-3 h-3" />
+                    Watch Demo
+                  </Link>
+                </div>
+
+              </div>
             </div>
-          </div>
-        </div>
+          </AnimatedShaderBackground>
         </div>
 
         {/* Features Section */}
@@ -86,18 +95,18 @@ export default function Home() {
         </section>
 
         {/* Guiding Section */}
-        <section id="guiding" className="bg-white py-24">
+        <section id="guiding" className="bg-black py-24">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-black">Start Your Journey</h2>
-              <p className="text-gray-600 mt-2">A step-by-step guide to your first Moodmap adventure.</p>
+              <h2 className="text-4xl font-bold text-white">Start Your Journey</h2>
+              <p className="text-gray-400 mt-2">A step-by-step guide to your first Moodmap adventure.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
               {/* Left Column */}
               <div>
                 <Carousel images={['/assets/guiding-pic-1.JPG', '/assets/guiding-pic-2.JPG', '/assets/guiding-pic-2.png']} />
-                <h3 className="text-3xl font-bold text-black mb-4 mt-6">Create Your First Map</h3>
-                <a href="#" className="text-black font-semibold flex items-center group">
+                <h3 className="text-3xl font-bold text-white mb-4 mt-6">Create Your First Map</h3>
+                <a href="#" className="text-white font-semibold flex items-center group">
                   Read More
                   <span className="ml-2 rounded-full w-6 h-6 flex items-center justify-center transition-transform group-hover:translate-x-1" style={{ backgroundColor: 'var(--primary-green)', color: 'black' }}>→</span>
                 </a>
@@ -105,11 +114,11 @@ export default function Home() {
 
               {/* Right Column */}
               <div className="flex flex-col space-y-8 mt-12 md:mt-0">
-                <h4 className="text-2xl font-bold text-black">Build Your Trip Library</h4>
-                <hr className="border-gray-300"/>
-                <h4 className="text-2xl font-bold text-black">Journal Your Adventures</h4>
-                <hr className="border-gray-300"/>
-                <h4 className="text-2xl font-bold text-black">Share with the Community</h4>
+                <h4 className="text-2xl font-bold text-white">Build Your Trip Library</h4>
+                <hr className="border-zinc-800"/>
+                <h4 className="text-2xl font-bold text-white">Journal Your Adventures</h4>
+                <hr className="border-zinc-800"/>
+                <h4 className="text-2xl font-bold text-white">Share with the Community</h4>
               </div>
             </div>
           </div>

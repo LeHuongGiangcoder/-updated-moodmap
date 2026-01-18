@@ -113,7 +113,15 @@ const CreateTripPage = () => {
             <label htmlFor="description" className="w-32 pr-4 text-right text-sm font-medium pt-2">Description</label>
             <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} className="form-input flex-1" />
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => router.push('/library')}
+              className="btn-tertiary"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Creating...' : 'Create Trip'}
             </button>
