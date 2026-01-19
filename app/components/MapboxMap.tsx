@@ -151,12 +151,54 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
 
   // Create GeoJSON for the line connecting points
   const geojson = useMemo(() => {
+    // Helper for smooth curve interpolation (Catmull-Rom spline)
+    const getCatmullRomPoint = (t: number, p0: number, p1: number, p2: number, p3: number) => {
+      const v0 = (p2 - p0) * 0.5;
+      const v1 = (p3 - p1) * 0.5;
+      const t2 = t * t;
+      const t3 = t * t2;
+      return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+    };
+
+    let lineCoordinates: number[][] = [];
+
+    if (coordinates.length > 1) {
+      // If we have enough points, smooth the path
+      if (coordinates.length > 2) {
+        const points: number[][] = [];
+        // Duplicate start and end points for the spline control points
+        const extendedCoords = [coordinates[0], ...coordinates, coordinates[coordinates.length - 1]];
+        const segments = 20;
+
+        for (let i = 0; i < extendedCoords.length - 3; i++) {
+          const p0 = extendedCoords[i];
+          const p1 = extendedCoords[i + 1];
+          const p2 = extendedCoords[i + 2];
+          const p3 = extendedCoords[i + 3];
+
+          for (let j = 0; j < segments; j++) {
+            const t = j / segments;
+            const x = getCatmullRomPoint(t, p0.lng, p1.lng, p2.lng, p3.lng);
+            const y = getCatmullRomPoint(t, p0.lat, p1.lat, p2.lat, p3.lat);
+            points.push([x, y]);
+          }
+        }
+        // Add the very last point
+        const last = coordinates[coordinates.length - 1];
+        points.push([last.lng, last.lat]);
+        lineCoordinates = points;
+      } else {
+        // Just 2 points, straight line is fine
+        lineCoordinates = coordinates.map(c => [c.lng, c.lat]);
+      }
+    }
+
     return {
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'LineString',
-        coordinates: coordinates.map(c => [c.lng, c.lat])
+        coordinates: lineCoordinates
       }
     };
   }, [coordinates]);
@@ -195,7 +237,8 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
               paint={{
                 'line-color': '#c1ea6f', // Primary green
                 'line-width': 3,
-                'line-opacity': 0.8
+                'line-opacity': 0.8,
+                'line-dasharray': [0.1, 2], // Create dotted effect
               }}
             />
           </Source>
