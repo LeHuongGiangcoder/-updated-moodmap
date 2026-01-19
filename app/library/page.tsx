@@ -4,6 +4,7 @@ import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import TripCard from '../components/TripCard';
 import { ChevronLeft } from 'lucide-react';
+import { GooeyLoader } from '@/components/ui/loader-10';
 
 interface Trip {
   id: string;
@@ -45,6 +46,16 @@ const LibraryPage = () => {
     setTrips(trips.filter((trip) => trip.id !== id));
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="container mx-auto px-4 pt-24 pb-8 flex justify-center items-center min-h-[60vh]">
+          <GooeyLoader />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 pt-10 pb-8">
@@ -61,22 +72,7 @@ const LibraryPage = () => {
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {isLoading ? (
-            // Loading Skeletons
-            Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-zinc-900 rounded-lg overflow-hidden h-[400px] animate-pulse">
-                <div className="h-64 bg-zinc-800 w-full" />
-                <div className="p-4 space-y-4">
-                  <div className="h-6 bg-zinc-800 w-3/4 rounded" />
-                  <div className="flex justify-between">
-                    <div className="h-4 bg-zinc-800 w-1/4 rounded" />
-                    <div className="h-4 bg-zinc-800 w-1/4 rounded" />
-                    <div className="h-4 bg-zinc-800 w-1/4 rounded" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : trips.length > 0 ? (
+          {trips.length > 0 ? (
             trips.map((trip) => (
               <TripCard key={trip.id} trip={trip} onDelete={handleDelete} />
             ))

@@ -56,7 +56,7 @@ const TiptapEditor = ({ content, onChange, editable = true }: TiptapEditorProps)
     editable: editable,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[300px] px-4 py-4',
+        class: 'prose prose-invert max-w-none focus:outline-none min-h-[300px] px-4 py-4 [&_p]:leading-[1.6] [&_p]:mb-3 [&_p]:mt-0 [&_li]:leading-[1.6] [&_li]:mb-1',
       },
     },
     onUpdate: ({ editor }) => {

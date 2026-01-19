@@ -6,12 +6,12 @@ import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { GooeyText } from '@/components/ui/gooey-text-morphing';
 import AnimatedShaderBackground from '@/components/ui/animated-shader-background';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPlay, FaArrowRight } from 'react-icons/fa';
-import Carousel from './components/Carousel';
+import Globe3D from './components/Globe3D';
 
 export default function Home() {
   return (
     <div className="relative bg-black">
-      <NavigationBar/>
+      <NavigationBar />
       <main>
         {/* Hero Section */}
         <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
@@ -41,13 +41,13 @@ export default function Home() {
                 <p className="text-lg md:text-xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto mb-10 leading-relaxed">
                   Create and share beautiful maps of your life&apos;s moments.
                   <br className="hidden md:block" />
-                  Visualize your memories in a 3D space designed for explorers.
+                  Visualize your memories in a map designed for explorers.
                 </p>
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                   <Link href="/library" className="btn-primary group">
-                    Start Mapping 
+                    Start Mapping
                     <FaArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link href="#demo" className="btn-secondary group">
@@ -71,7 +71,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="relative bg-zinc-900 p-8 rounded-lg flex flex-col justify-between transition-colors hover:bg-zinc-800 min-h-[300px]">
                 <GlowingEffect disabled={false} glow={true} />
-                <h3 className="relative z-10 text-3xl font-bold text-white leading-tight">Interactive<br/>Mapping</h3>
+                <h3 className="relative z-10 text-3xl font-bold text-white leading-tight">Interactive<br />Mapping</h3>
                 <p className="relative z-10 text-gray-400">
                   Add locations, draw routes, and customize your map. Your journey, your style.
                 </p>
@@ -80,12 +80,12 @@ export default function Home() {
                 <GlowingEffect disabled={false} glow={true} />
                 <h3 className="relative z-10 text-3xl font-bold text-white leading-tight">Rich Journaling</h3>
                 <p className="relative z-10 text-gray-400">
-                  Bring your memories to life with photos, videos, and rich text entries for every step of the way.
+                  Bring your memories to life with rich text entries for every step of the way.
                 </p>
               </div>
               <div className="relative bg-zinc-900 p-8 rounded-lg flex flex-col justify-between transition-colors hover:bg-zinc-800 min-h-[300px]">
                 <GlowingEffect disabled={false} glow={true} />
-                <h3 className="relative z-10 text-3xl font-bold text-white leading-tight">Community &<br/>Sharing</h3>
+                <h3 className="relative z-10 text-3xl font-bold text-white leading-tight">Community &<br />Sharing</h3>
                 <p className="relative z-10 text-gray-400">
                   Share your adventures with friends, family, and community. Inspire and be inspired.
                 </p>
@@ -98,10 +98,9 @@ export default function Home() {
         <section id="guiding" className="bg-black py-32 relative overflow-hidden">
           {/* Decorative glow */}
           <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-[var(--primary-pink)]/5 rounded-full blur-[120px] pointer-events-none" />
-          
+
           <div className="container mx-auto px-6 relative z-10">
             <div className="text-center mb-20">
-              <span className="text-[var(--primary-green)] font-medium tracking-wider uppercase text-sm mb-4 block">How it works</span>
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Start Your Journey</h2>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">A step-by-step guide to documenting your adventures with Moodmap.</p>
             </div>
@@ -110,14 +109,14 @@ export default function Home() {
               {/* Left Column - Visuals */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-pink)] rounded-2xl blur-xl opacity-20" />
-                <div className="relative bg-zinc-900 rounded-2xl border border-zinc-800 p-2 shadow-2xl">
-                  <Carousel images={['/assets/guiding-pic-1.JPG', '/assets/guiding-pic-2.JPG', '/assets/guiding-pic-2.png']} />
+                <div className="relative">
+                  <Globe3D />
                 </div>
               </div>
 
               {/* Right Column - Steps */}
               <div className="flex flex-col space-y-6">
-                
+
                 {/* Step 1 */}
                 <div className="group p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800 hover:border-[var(--primary-green)] hover:bg-zinc-900/50 transition-all duration-300">
                   <div className="flex items-start gap-5">

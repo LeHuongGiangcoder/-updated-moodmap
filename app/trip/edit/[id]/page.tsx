@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { GooeyLoader } from '@/components/ui/loader-10';
 
 const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
@@ -76,7 +77,7 @@ const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!unwrappedParams?.id) return;
-    
+
     if (isSubmitting) return;
     setIsSubmitting(true);
 
@@ -104,8 +105,8 @@ const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
   if (isLoading || !unwrappedParams) {
     return (
       <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 pt-24 pb-8 flex justify-center items-center">
-          <p>Loading trip details...</p>
+        <div className="container mx-auto px-4 pt-24 pb-8 flex justify-center items-center min-h-[60vh]">
+          <GooeyLoader />
         </div>
       </div>
     );
@@ -148,7 +149,15 @@ const EditTripPage = ({ params }: { params: Promise<{ id: string }> }) => {
             <label htmlFor="description" className="w-32 pr-4 text-right text-sm font-medium pt-2">Description</label>
             <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows={4} className="form-input flex-1" />
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => router.push('/library')}
+              className="btn-tertiary"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Updating...' : 'Update Trip'}
             </button>
