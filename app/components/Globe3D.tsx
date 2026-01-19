@@ -39,7 +39,7 @@ const Globe3D = () => {
         return () => cancelAnimationFrame(animationFrameId);
     }, []);
 
-    if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+    if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
         return (
             <div className="h-full w-full bg-zinc-900 flex items-center justify-center rounded-2xl border border-zinc-800">
                 <p className="text-red-500">Mapbox Token not found</p>
@@ -58,7 +58,7 @@ const Globe3D = () => {
                 onMove={onMove}
                 style={{ width: '100%', height: '100%' }}
                 mapStyle="mapbox://styles/mapbox/dark-v11"
-                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
                 projection={{ name: 'globe' } as any}
                 fog={{
                     'range': [0.5, 10],

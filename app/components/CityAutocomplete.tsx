@@ -40,14 +40,14 @@ const CityAutocomplete = ({ value, onChange, className, placeholder = 'Search fo
     const timeoutId = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+        const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
         if (!token) return;
 
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(value)}.json?access_token=${token}&types=place&limit=5`
         );
         const data = await response.json();
-        
+
         if (data.features) {
           setSuggestions(data.features);
           setIsOpen(true);

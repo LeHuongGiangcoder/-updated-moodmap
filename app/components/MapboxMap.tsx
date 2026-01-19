@@ -37,14 +37,14 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
   // Function to geocode a city name
   const geocodeCity = async (city: string): Promise<Coordinate | null> => {
     try {
-      const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+      const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
       if (!token) return null;
 
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(city)}.json?access_token=${token}&limit=1`
       );
       const data = await response.json();
-      
+
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].center;
         return { lng, lat, city };
@@ -60,18 +60,18 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
     const fetchCoordinates = async () => {
       setIsLoading(true);
       const coords: Coordinate[] = [];
-      
+
       // If we have entries, map them
       if (entries && entries.length > 0) {
         const uniqueCities = Array.from(new Set(entries.map(e => e.city)));
-        
+
         for (const city of uniqueCities) {
           const coord = await geocodeCity(city);
           if (coord) {
             coords.push(coord);
           }
         }
-      } 
+      }
       // Fallback to trip location if no entries
       else if (tripLocation) {
         const coord = await geocodeCity(tripLocation);
@@ -144,7 +144,7 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
         mapRef.current.resize();
       }
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -203,7 +203,7 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
     };
   }, [coordinates]);
 
-  if (!process.env.NEXT_PUBLIC_MAPBOX_TOKEN) {
+  if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
     return (
       <div className="h-full w-full bg-zinc-900 flex items-center justify-center">
         <p className="text-red-500">Mapbox Token not found</p>
@@ -219,7 +219,7 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
         onMove={evt => setViewState(evt.viewState)}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/dark-v11"
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         attributionControl={false}
       >
         <NavigationControl position="bottom-right" />
@@ -246,22 +246,22 @@ const MapboxMap = ({ entries = [], tripLocation }: MapboxMapProps) => {
 
         {/* Markers for each city */}
         {coordinates.map((coord, index) => (
-          <Marker 
-            key={`${coord.city}-${index}`} 
-            longitude={coord.lng} 
-            latitude={coord.lat} 
+          <Marker
+            key={`${coord.city}-${index}`}
+            longitude={coord.lng}
+            latitude={coord.lat}
             anchor="bottom"
           >
-             <div className="flex flex-col items-center group">
-               <div className="bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity mb-1 whitespace-nowrap">
-                 {coord.city}
-               </div>
-               <MapPin className="w-6 h-6 text-[var(--primary-pink)] fill-[var(--primary-pink)]/20" />
-             </div>
+            <div className="flex flex-col items-center group">
+              <div className="bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity mb-1 whitespace-nowrap">
+                {coord.city}
+              </div>
+              <MapPin className="w-6 h-6 text-[var(--primary-pink)] fill-[var(--primary-pink)]/20" />
+            </div>
           </Marker>
         ))}
       </Map>
-      
+
       {isLoading && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
           <div className="w-6 h-6 border-2 border-[var(--primary-green)] border-t-transparent rounded-full animate-spin"></div>
