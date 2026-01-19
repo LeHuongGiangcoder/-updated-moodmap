@@ -48,7 +48,7 @@ const Globe3D = () => {
     }
 
     return (
-        <div className="h-[500px] w-full relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 backdrop-blur-sm shadow-2xl">
+        <div className="h-full min-h-[500px] w-full relative rounded-2xl overflow-hidden border border-zinc-800 bg-black/50 backdrop-blur-sm shadow-2xl">
             {/* Decorative overlay gradient */}
             <div className="absolute inset-0 z-10 pointer-events-none bg-radial-gradient from-transparent to-black/40" />
 

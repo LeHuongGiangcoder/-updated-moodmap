@@ -38,7 +38,7 @@ export default function Home() {
                 </div>
 
                 {/* Subheadline */}
-                <p className="text-lg md:text-xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto mb-10 leading-relaxed">
+                <p className="text-lg md:text-xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto mt-6 mb-12 leading-relaxed">
                   Create and share beautiful maps of your life&apos;s moments.
                   <br className="hidden md:block" />
                   Visualize your memories in a map designed for explorers.
@@ -107,9 +107,9 @@ export default function Home() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Left Column - Visuals */}
-              <div className="relative">
+              <div className="relative lg:sticky lg:top-32 h-full min-h-[500px]">
                 <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-pink)] rounded-2xl blur-xl opacity-20" />
-                <div className="relative">
+                <div className="relative h-full">
                   <Globe3D />
                 </div>
               </div>
