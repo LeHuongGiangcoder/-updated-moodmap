@@ -95,30 +95,69 @@ export default function Home() {
         </section>
 
         {/* Guiding Section */}
-        <section id="guiding" className="bg-black py-24">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white">Start Your Journey</h2>
-              <p className="text-gray-400 mt-2">A step-by-step guide to your first Moodmap adventure.</p>
+        <section id="guiding" className="bg-black py-32 relative overflow-hidden">
+          {/* Decorative glow */}
+          <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-[var(--primary-pink)]/5 rounded-full blur-[120px] pointer-events-none" />
+          
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-20">
+              <span className="text-[var(--primary-green)] font-medium tracking-wider uppercase text-sm mb-4 block">How it works</span>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Start Your Journey</h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">A step-by-step guide to documenting your adventures with Moodmap.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-              {/* Left Column */}
-              <div>
-                <Carousel images={['/assets/guiding-pic-1.JPG', '/assets/guiding-pic-2.JPG', '/assets/guiding-pic-2.png']} />
-                <h3 className="text-3xl font-bold text-white mb-4 mt-6">Create Your First Map</h3>
-                <a href="#" className="text-white font-semibold flex items-center group">
-                  Read More
-                  <span className="ml-2 rounded-full w-6 h-6 flex items-center justify-center transition-transform group-hover:translate-x-1" style={{ backgroundColor: 'var(--primary-green)', color: 'black' }}>→</span>
-                </a>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              {/* Left Column - Visuals */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-pink)] rounded-2xl blur-xl opacity-20" />
+                <div className="relative bg-zinc-900 rounded-2xl border border-zinc-800 p-2 shadow-2xl">
+                  <Carousel images={['/assets/guiding-pic-1.JPG', '/assets/guiding-pic-2.JPG', '/assets/guiding-pic-2.png']} />
+                </div>
               </div>
 
-              {/* Right Column */}
-              <div className="flex flex-col space-y-8 mt-12 md:mt-0">
-                <h4 className="text-2xl font-bold text-white">Build Your Trip Library</h4>
-                <hr className="border-zinc-800"/>
-                <h4 className="text-2xl font-bold text-white">Journal Your Adventures</h4>
-                <hr className="border-zinc-800"/>
-                <h4 className="text-2xl font-bold text-white">Share with the Community</h4>
+              {/* Right Column - Steps */}
+              <div className="flex flex-col space-y-6">
+                
+                {/* Step 1 */}
+                <div className="group p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800 hover:border-[var(--primary-green)] hover:bg-zinc-900/50 transition-all duration-300">
+                  <div className="flex items-start gap-5">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[var(--primary-green)]/10 border border-[var(--primary-green)]/20 flex items-center justify-center text-[var(--primary-green)] font-bold text-lg group-hover:scale-110 transition-transform">1</div>
+                    <div>
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[var(--primary-green)] transition-colors">Build Your Trip Library</h4>
+                      <p className="text-gray-400 leading-relaxed">Start by creating a trip. Add details like location, duration, and cover photos to organize your past and future travels.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="group p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800 hover:border-[var(--primary-pink)] hover:bg-zinc-900/50 transition-all duration-300">
+                  <div className="flex items-start gap-5">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[var(--primary-pink)]/10 border border-[var(--primary-pink)]/20 flex items-center justify-center text-[var(--primary-pink)] font-bold text-lg group-hover:scale-110 transition-transform">2</div>
+                    <div>
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-[var(--primary-pink)] transition-colors">Journal Your Adventures</h4>
+                      <p className="text-gray-400 leading-relaxed">Document every moment. Add rich text entries, photos, and pin locations on the interactive map to tell your story.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="group p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800 hover:border-white hover:bg-zinc-900/50 transition-all duration-300">
+                  <div className="flex items-start gap-5">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">3</div>
+                    <div>
+                      <h4 className="text-xl font-bold text-white mb-2 group-hover:text-white transition-colors">Share with the Community</h4>
+                      <p className="text-gray-400 leading-relaxed">Publish your maps to the community or keep them private. Inspire others and discover new destinations.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 pl-4">
+                  <Link href="/library" className="btn-tertiary group inline-flex items-center">
+                    Start Your First Map
+                    <FaArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+
               </div>
             </div>
           </div>
