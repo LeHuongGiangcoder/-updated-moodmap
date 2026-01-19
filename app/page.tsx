@@ -33,7 +33,7 @@ export default function Home() {
                     morphTime={0.6}
                     cooldownTime={2.5}
                     className="font-bold w-full"
-                    textClassName="text-white text-5xl md:text-8xl whitespace-nowrap font-['Geomanist'] tracking-tight font-bold leading-tight"
+                    textClassName="text-white text-4xl md:text-6xl whitespace-nowrap font-['Geomanist'] tracking-tight font-bold leading-tight"
                   />
                 </div>
 
